@@ -3,17 +3,20 @@ defmodule MockHttpServer.RegistrationService do
 
   @process_name __MODULE__
 
-  def start_link( opts \\ [] ) do
-    { :ok, pid } = GenServer.start_link( __MODULE__, :ok, opts )
-    Process.register( pid, @process_name )
+  def start_link( _opts \\ [] ) do
+    GenServer.start_link( __MODULE__, :ok, [ name: @process_name ] )
+  end
+
+  def stop do
+    GenServer.call( @process_name, :shutdown )
   end
 
   # external API
-  def register( response = { status_code, headers, body } ) do
+  def register( response ) do
     GenServer.call( @process_name, { :register, response } )
   end
 
-  def register_default_action( response = { status_code, headers, body } ) do
+  def register_default_action( response ) do
     GenServer.call( @process_name, { :register_default_action, response } )
   end
 
@@ -46,5 +49,9 @@ defmodule MockHttpServer.RegistrationService do
 
   def handle_call( { :unregister, tid }, _from, hash_dict ) do
     { :reply, :ok, HashDict.delete( hash_dict, tid ) }
+  end
+
+  def handle_call( :shutdown, _from, hash_dict ) do
+    { :stop, :normal, :ok, hash_dict }
   end
 end
