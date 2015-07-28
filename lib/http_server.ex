@@ -6,7 +6,7 @@ defmodule MockHttpServer.HttpServer do
     options
   end
 
-  def call( conn, _opts ) do
+  def call( conn, _opts \\ [] ) do
     conn 
     |> get_registered_response
     |> set_response_headers
@@ -14,8 +14,10 @@ defmodule MockHttpServer.HttpServer do
   end
 
   defp get_registered_response( conn ) do
-    response = List.keyfind( conn.req_headers["X-Mock-TID"] ) 
-               |> RegistrationService.fetch
+    IO.inspect conn.req_headers
+    { _header_name, tid } = List.keyfind( conn.req_headers, "X-Mock-TID", 0 ) 
+    response = RegistrationService.fetch( tid )
+    IO.inspect response
     { conn, response }
   end
 

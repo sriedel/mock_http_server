@@ -30,28 +30,31 @@ defmodule MockHttpServer.RegistrationService do
 
   # internal API
   def init( :ok ) do
-    dict = HashDict.put( HashDict.new, :unknown, { 200, {}, "" } )
-    { :ok, dict }
+    dict = HashDict.put( HashDict.new, :unknown, { 999, [], "" } )
+    init_serial = 0
+    { :ok, { dict, init_serial } }
   end
 
-  def handle_call( { :register, response }, _from, hash_dict ) do
-    tid = :erlang.make_ref
-    { :reply, tid, HashDict.put( hash_dict, tid, response ) }
+  def handle_call( { :register, response }, _from, { hash_dict, request_serial } ) do
+    tid = ( request_serial + 1 ) |> Integer.to_string
+    { :reply, tid, { HashDict.put( hash_dict, tid, response ), tid } }
   end
 
-  def handle_call( { :register_default_action, response }, _from, hash_dict ) do
-    { :reply, :ok, HashDict.put( hash_dict, :unknown, response ) }
+  def handle_call( { :register_default_action, response }, _from, { hash_dict, request_serial } ) do
+    { :reply, :ok, { HashDict.put( hash_dict, :unknown, response ), request_serial } }
   end
 
-  def handle_call( { :fetch, tid }, _from, hash_dict ) do
-    { :reply, HashDict.get( hash_dict, tid, HashDict.get( hash_dict, :unknown ) ), hash_dict }
+  def handle_call( { :fetch, tid }, _from, state = { hash_dict, _ } ) do
+    IO.inspect tid
+    IO.inspect hash_dict
+    { :reply, HashDict.get( hash_dict, tid, HashDict.get( hash_dict, :unknown ) ), state }
   end
 
-  def handle_call( { :unregister, tid }, _from, hash_dict ) do
-    { :reply, :ok, HashDict.delete( hash_dict, tid ) }
+  def handle_call( { :unregister, tid }, _from, { hash_dict, request_serial } ) do
+    { :reply, :ok, { HashDict.delete( hash_dict, tid ), request_serial } }
   end
 
-  def handle_call( :shutdown, _from, hash_dict ) do
-    { :stop, :normal, :ok, hash_dict }
+  def handle_call( :shutdown, _from, state ) do
+    { :stop, :normal, :ok, state }
   end
 end
