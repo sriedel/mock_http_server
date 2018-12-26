@@ -3,11 +3,11 @@ defmodule MockHttpServer.Mixfile do
 
   def project do
     [app: :mock_http_server,
-     version: "0.0.1",
-     elixir: "~> 1.0",
-     build_embedded: Mix.env == :prod,
+     version: "0.0.2",
+     elixir: "~> 1.7",
+     build_embedded:  Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps]
+     deps: deps()]
   end
 
   # Configuration for the OTP application
@@ -27,8 +27,9 @@ defmodule MockHttpServer.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
-    [ { :plug, "~> 0.13.0" },
-      { :cowboy, "~> 1.0.0" }
+    [ { :plug, "~> 1.7.0" },
+      { :cowboy, "~> 2.6.0" },
+      { :plug_cowboy, "~> 2.0.0" }
     ]
   end
 end

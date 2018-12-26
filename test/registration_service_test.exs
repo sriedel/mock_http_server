@@ -36,7 +36,7 @@ defmodule MockHttpServerRegistrationTest do
     { :ok, _ } = MockHttpServer.RegistrationService.start_link
     tid = MockHttpServer.RegistrationService.register( registered_response )
     MockHttpServer.RegistrationService.unregister( tid )
-    refute ^registered_response = MockHttpServer.RegistrationService.fetch( tid )
+    assert { 999, [], "" } = MockHttpServer.RegistrationService.fetch( tid )
     MockHttpServer.RegistrationService.stop
   end
 end

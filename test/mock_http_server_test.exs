@@ -15,7 +15,7 @@ defmodule MockHttpServerTest do
     { true_response_code,
       true_response_headers,
       true_response_body } = conn( :get, "/some/path", "" ) 
-                             |> put_req_header( "X-Mock-TID", tid )
+                             |> put_req_header( "x-mock-tid", tid )
                              |> MockHttpServer.HttpServer.call
                              |> sent_resp
     MockHttpServer.RegistrationService.stop
