@@ -6,7 +6,7 @@ defmodule MockHttpServerTest do
   test "requesting a set-up mocked test url by tid" do
     { :ok, _ } = MockHttpServer.RegistrationService.start_link
     response_code = 404
-    response_headers = []
+    response_headers = [ { "x-foo", "bar" } ]
     response_body = "I am a body"
     response = { response_code, response_headers, response_body }
 
@@ -22,7 +22,8 @@ defmodule MockHttpServerTest do
 
     assert true_response_code == response_code
     assert true_response_body == response_body
-    #TODO: Test response headers
+    assert is_list( true_response_headers )
+    { "x-foo", "bar" } = Enum.find( true_response_headers, nil, fn({k, _v}) -> "x-foo" == k end )
   end
 
   # test "requesting a non-mocked test url"

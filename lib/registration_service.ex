@@ -30,28 +30,28 @@ defmodule MockHttpServer.RegistrationService do
 
   # internal API
   def init( :ok ) do
-    dict = HashDict.put( HashDict.new, :unknown, { 999, [], "" } )
+    map = Map.put( %{}, :unknown, { 999, [], "" } )
     init_serial = 0
-    { :ok, { dict, init_serial } }
+    { :ok, { map, init_serial } }
   end
 
-  def handle_call( { :register, response }, _from, { hash_dict, request_serial } ) do
+  def handle_call( { :register, response }, _from, { map, request_serial } ) do
     tid = ( request_serial + 1 ) |> Integer.to_string
-    { :reply, tid, { HashDict.put( hash_dict, tid, response ), tid } }
+    { :reply, tid, { Map.put( map, tid, response ), tid } }
   end
 
-  def handle_call( { :register_default_action, response }, _from, { hash_dict, request_serial } ) do
-    { :reply, :ok, { HashDict.put( hash_dict, :unknown, response ), request_serial } }
+  def handle_call( { :register_default_action, response }, _from, { map, request_serial } ) do
+    { :reply, :ok, { Map.put( map, :unknown, response ), request_serial } }
   end
 
-  def handle_call( { :fetch, tid }, _from, state = { hash_dict, _ } ) do
-    IO.inspect tid
-    IO.inspect hash_dict
-    { :reply, HashDict.get( hash_dict, tid, HashDict.get( hash_dict, :unknown ) ), state }
+  def handle_call( { :fetch, tid }, _from, state = { map, _ } ) do
+    # IO.inspect tid
+    # IO.inspect hash_dict
+    { :reply, Map.get( map, tid, Map.get( map, :unknown ) ), state }
   end
 
-  def handle_call( { :unregister, tid }, _from, { hash_dict, request_serial } ) do
-    { :reply, :ok, { HashDict.delete( hash_dict, tid ), request_serial } }
+  def handle_call( { :unregister, tid }, _from, { map, request_serial } ) do
+    { :reply, :ok, { Map.delete( map, tid ), request_serial } }
   end
 
   def handle_call( :shutdown, _from, state ) do

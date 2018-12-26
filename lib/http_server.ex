@@ -14,10 +14,10 @@ defmodule MockHttpServer.HttpServer do
   end
 
   defp get_registered_response( conn ) do
-    IO.inspect conn.req_headers
+    # IO.inspect conn.req_headers
     { _header_name, tid } = List.keyfind( conn.req_headers, "x-mock-tid", 0 ) 
     response = RegistrationService.fetch( tid )
-    IO.inspect response
+    # IO.inspect response
     { conn, response }
   end
 
