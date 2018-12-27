@@ -37,7 +37,7 @@ defmodule MockHttpServer.RegistrationService do
 
   def handle_call( { :register, response }, _from, { map, request_serial } ) do
     tid = ( request_serial + 1 ) |> Integer.to_string
-    { :reply, tid, { Map.put( map, tid, response ), tid } }
+    { :reply, tid, { Map.put( map, tid, response ), request_serial + 1 } }
   end
 
   def handle_call( { :register_default_action, response }, _from, { map, request_serial } ) do
