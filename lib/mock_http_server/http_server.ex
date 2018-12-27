@@ -15,7 +15,7 @@ defmodule MockHttpServer.HttpServer do
 
   defp get_registered_response( conn ) do
     # IO.inspect conn.req_headers
-    { _header_name, tid } = List.keyfind( conn.req_headers, "x-mock-tid", 0 ) 
+    { _header_name, tid } = List.keyfind( conn.req_headers, "x-mock-tid", 0, { nil, nil } )
     response = RegistrationService.fetch( tid )
     # IO.inspect response
     { conn, response }
