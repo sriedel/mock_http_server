@@ -2,6 +2,10 @@ defmodule MockHttpServer.HttpServer do
   alias MockHttpServer.RegistrationService
   import Plug.Conn
 
+  def start( ip, port ) when is_tuple( ip ) and is_integer( port )
+    Plug.Cowboy.http( __MODULE__, [], port: port, ip: ip )
+  end
+
   def init( options ) do
     options
   end
