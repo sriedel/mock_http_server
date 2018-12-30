@@ -58,6 +58,36 @@ defmodule MockHttpServerRegistrationTest do
     RegistrationService.stop
   end
 
+  test "registering a response with a url containing method, scheme, host and path and query" do
+    default_response = { 999, [], "" }
+    registered_response = { 404, [], "not found" }
+    registered_url = "http://www.example.com/some/path?bar=baz"
+    { :ok, _ } = RegistrationService.start_link
+    tid = RegistrationService.register( "POST", registered_url, registered_response )
+    assert ^registered_response = RegistrationService.fetch( "POST", registered_url, tid )
+    assert ^default_response = RegistrationService.fetch( tid )
+    assert ^default_response = RegistrationService.fetch( "POST", "http://www.example.com", tid )
+    assert ^default_response = RegistrationService.fetch( "POST", "http://www.example.com/some/other/path", tid )
+    assert ^default_response = RegistrationService.fetch( "POST", "https://www.example.com/some/path", tid )
+    assert ^default_response = RegistrationService.fetch( "POST", "http://www.example.com/some/path?bar=quux", tid )
+    assert ^default_response = RegistrationService.fetch( "PUT", "http://www.example.com/some/path?bar=baz", tid )
+    assert ^default_response = RegistrationService.fetch( "http://www.example.com/some/path?bar=baz", tid )
+    RegistrationService.stop
+  end
+
+  test "registering multiple responses with a url, but requesting without tid" do
+    registered_url = "http://www.example.com/some/path?bar=baz"
+    first_registered_response = { 404, [], "not found" }
+    second_registered_response = { 404, [], "not found" }
+    { :ok, _ } = RegistrationService.start_link
+    tid = RegistrationService.register( registered_url, first_registered_response )
+    tid2 = RegistrationService.register( registered_url, second_registered_response )
+    assert ^first_registered_response = RegistrationService.fetch( registered_url, tid )
+    assert ^second_registered_response = RegistrationService.fetch( registered_url, tid2 )
+    assert ^first_registered_response = RegistrationService.fetch( registered_url, nil )
+    RegistrationService.stop
+  end
+
   test "fetching the default response if the tid is unknown" do
     default_response = { 999, [], "" }
     { :ok, _ } = RegistrationService.start_link

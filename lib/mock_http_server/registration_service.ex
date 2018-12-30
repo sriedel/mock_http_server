@@ -69,8 +69,17 @@ defmodule MockHttpServer.RegistrationService do
     { :reply, Map.get( map, tid, Map.get( map, :unknown ) ), state }
   end
 
+  def handle_call( { :fetch, method, url, nil }, _from, state = { map, _ } ) do
+    first_tid = ( get_in( map, [ url, method ] ) || %{} )
+                |> Map.keys
+                |> Enum.sort
+                |> Enum.at( 0 )
+    response = get_in( map, [ url, method, first_tid ] ) || Map.get( map, :unknown )
+    { :reply, response, state }
+  end
+
   def handle_call( { :fetch, method, url, tid }, _from, state = { map, _ } ) do
-    { :reply, get_in( map, [ url, method, tid ] ) || Map.get(map, :unknown), state }
+    { :reply, get_in( map, [ url, method, tid ] ) || Map.get( map, :unknown ), state }
   end
 
   def handle_call( { :unregister, tid }, _from, { map, request_serial } ) do
