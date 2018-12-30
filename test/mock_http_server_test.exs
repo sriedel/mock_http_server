@@ -1,25 +1,27 @@
 defmodule MockHttpServerTest do
   use ExUnit.Case
   use Plug.Test
+  alias MockHttpServer.RegistrationService
+  alias MockHttpServer.HttpServer
 
   test "requesting a set-up mocked test url by tid" do
-    { :ok, _ } = MockHttpServer.RegistrationService.start_link
+    { :ok, _ } = RegistrationService.start_link
     registered_url = "http://www.example.com/some/path"
     response_code = 404
     response_headers = [ { "x-foo", "bar" } ]
     response_body = "I am a body"
     response = { response_code, response_headers, response_body }
 
-    tid = MockHttpServer.RegistrationService.register( registered_url, response )
+    tid = RegistrationService.register( registered_url, response )
 
     { true_response_code,
       true_response_headers,
       true_response_body } = conn( :get, "/some/path", "" )
                              |> put_req_header( "x-mock-tid", tid )
                              |> put_req_header( "host", "www.example.com" )
-                             |> MockHttpServer.HttpServer.call
+                             |> HttpServer.call
                              |> sent_resp
-    MockHttpServer.RegistrationService.stop
+    RegistrationService.stop
 
     assert true_response_code == response_code
     assert true_response_body == response_body
@@ -28,15 +30,16 @@ defmodule MockHttpServerTest do
   end
 
   test "requesting a non-mocked test url" do
-    { :ok, _ } = MockHttpServer.RegistrationService.start_link
+    { :ok, _ } = RegistrationService.start_link
 
     { true_response_code,
       true_response_headers,
       true_response_body } = conn( :get, "/some/path", "" ) 
-                             |> MockHttpServer.HttpServer.call
+                             |> put_req_header( "host", "www.example.com" )
+                             |> HttpServer.call
                              |> sent_resp
     
-    MockHttpServer.RegistrationService.stop
+    RegistrationService.stop
 
     assert true_response_code == 999
     assert true_response_headers == [ { "cache-control", "max-age=0, private, must-revalidate" } ]
@@ -44,21 +47,22 @@ defmodule MockHttpServerTest do
   end
 
   test "requesting a non-mocked test url after changing the default response" do
-    { :ok, _ } = MockHttpServer.RegistrationService.start_link
+    { :ok, _ } = RegistrationService.start_link
     default_response_code = 404
     default_response_headers = []
     default_response_body = "Foo"
 
     default_response = { default_response_code, default_response_headers, default_response_body }
 
-    MockHttpServer.RegistrationService.register_default_action( default_response )
+    RegistrationService.register_default_action( default_response )
     { mocked_response_code,
       mocked_response_headers,
       mocked_response_body } = conn( :get, "/some/path", "" ) 
-                               |> MockHttpServer.HttpServer.call
+                               |> put_req_header( "host", "www.example.com" )
+                               |> HttpServer.call
                                |> sent_resp
     
-    MockHttpServer.RegistrationService.stop
+    RegistrationService.stop
 
     assert mocked_response_code == default_response_code
     assert mocked_response_headers == [ { "cache-control", "max-age=0, private, must-revalidate" } ]
