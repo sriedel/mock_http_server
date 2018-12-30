@@ -66,7 +66,7 @@ If no match can be found, a request will return
 
 This response can be changed by registering a default action:
 
-  MockHttpServer.RegistrationService.register( { 404, [], "Whatcha talkin about, Willis?" } )
+    MockHttpServer.RegistrationService.register( { 404, [], "Whatcha talkin about, Willis?" } )
     { returned_response_code,
       returned_response_headers,
       returned_response_body } = conn( :get, "/some/path", "" )
