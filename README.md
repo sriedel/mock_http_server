@@ -55,6 +55,7 @@ Trigger a canned response to a query:
                                  |> sent_resp
 
 Or by using an http client:
+
     { returned_response_code,
       returned_response_headers,
       returned_response_body } = HTTPoison.get!( "http://www.example.com/some/request/path",
