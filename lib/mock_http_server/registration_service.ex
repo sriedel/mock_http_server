@@ -16,6 +16,10 @@ defmodule MockHttpServer.RegistrationService do
     GenServer.call( @process_name, { :register, response } )
   end
 
+  def register( url, response ) do
+    GenServer.call( @process_name, { :register, url, response } )
+  end
+
   def register_default_action( response ) do
     GenServer.call( @process_name, { :register_default_action, response } )
   end
@@ -26,6 +30,10 @@ defmodule MockHttpServer.RegistrationService do
 
   def fetch( tid ) do
     GenServer.call( @process_name, { :fetch, tid } )
+  end
+
+  def fetch( url, tid ) do
+    GenServer.call( @process_name, { :fetch, url, tid } )
   end
 
   # internal API
@@ -40,14 +48,29 @@ defmodule MockHttpServer.RegistrationService do
     { :reply, tid, { Map.put( map, tid, response ), request_serial + 1 } }
   end
 
+  def handle_call( { :register, url, response }, _from, { map, request_serial } ) do
+    tid = ( request_serial + 1 ) |> Integer.to_string
+    url_map = Map.get( map, url, %{} )
+              |> Map.put( tid, response )
+    { :reply, tid, { Map.put( map, url, url_map ), request_serial + 1 } }
+  end
+
   def handle_call( { :register_default_action, response }, _from, { map, request_serial } ) do
     { :reply, :ok, { Map.put( map, :unknown, response ), request_serial } }
   end
 
   def handle_call( { :fetch, tid }, _from, state = { map, _ } ) do
-    # IO.inspect tid
-    # IO.inspect hash_dict
     { :reply, Map.get( map, tid, Map.get( map, :unknown ) ), state }
+  end
+
+  def handle_call( { :fetch, url, tid }, _from, state = { map, _ } ) do
+    url_map = Map.get( map, url )
+    response = case url_map do
+                 m when is_map( m ) -> Map.get( m, tid, Map.get( map, :unknown ) )
+                 nil -> Map.get( map, :unknown )
+               end
+
+    { :reply, response, state }
   end
 
   def handle_call( { :unregister, tid }, _from, { map, request_serial } ) do

@@ -1,6 +1,7 @@
 defmodule MockHttpServer.HttpServer do
   alias MockHttpServer.RegistrationService
   import Plug.Conn
+  require IEx
 
   def start( ip, port ) when is_tuple( ip ) and is_integer( port ) do
     Plug.Cowboy.http( __MODULE__, [], port: port, ip: ip )
@@ -19,8 +20,9 @@ defmodule MockHttpServer.HttpServer do
 
   defp get_registered_response( conn ) do
     # IO.inspect conn.req_headers
+    IEx.pry
     { _header_name, tid } = List.keyfind( conn.req_headers, "x-mock-tid", 0, { nil, nil } )
-    response = RegistrationService.fetch( tid )
+    response = RegistrationService.fetch( request_url( conn ), tid )
     # IO.inspect response
     { conn, response }
   end

@@ -4,17 +4,19 @@ defmodule MockHttpServerTest do
 
   test "requesting a set-up mocked test url by tid" do
     { :ok, _ } = MockHttpServer.RegistrationService.start_link
+    registered_url = "http://www.example.com/some/path"
     response_code = 404
     response_headers = [ { "x-foo", "bar" } ]
     response_body = "I am a body"
     response = { response_code, response_headers, response_body }
 
-    tid = MockHttpServer.RegistrationService.register( response )
+    tid = MockHttpServer.RegistrationService.register( registered_url, response )
 
     { true_response_code,
       true_response_headers,
-      true_response_body } = conn( :get, "/some/path", "" ) 
+      true_response_body } = conn( :get, "/some/path", "" )
                              |> put_req_header( "x-mock-tid", tid )
+                             |> put_req_header( "host", "www.example.com" )
                              |> MockHttpServer.HttpServer.call
                              |> sent_resp
     MockHttpServer.RegistrationService.stop
