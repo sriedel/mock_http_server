@@ -16,8 +16,10 @@ defmodule MockHttpServer.RegistrationService do
     GenServer.call( @process_name, { :register, response } )
   end
 
-  def register( url, response ) do
-    GenServer.call( @process_name, { :register, url, response } )
+  def register( url, response ), do: register( "GET", url, response )
+
+  def register( method, url, response ) do
+    GenServer.call( @process_name, { :register, method, url, response } )
   end
 
   def register_default_action( response ) do
@@ -32,8 +34,10 @@ defmodule MockHttpServer.RegistrationService do
     GenServer.call( @process_name, { :fetch, tid } )
   end
 
-  def fetch( url, tid ) do
-    GenServer.call( @process_name, { :fetch, url, tid } )
+  def fetch( url, tid ), do: fetch( "GET", url, tid )
+
+  def fetch( method, url, tid ) do
+    GenServer.call( @process_name, { :fetch, method, url, tid } )
   end
 
   # internal API
@@ -48,11 +52,13 @@ defmodule MockHttpServer.RegistrationService do
     { :reply, tid, { Map.put( map, tid, response ), request_serial + 1 } }
   end
 
-  def handle_call( { :register, url, response }, _from, { map, request_serial } ) do
+  def handle_call( { :register, method, url, response }, _from, { map, request_serial } ) do
     tid = ( request_serial + 1 ) |> Integer.to_string
-    url_map = Map.get( map, url, %{} )
-              |> Map.put( tid, response )
-    { :reply, tid, { Map.put( map, url, url_map ), request_serial + 1 } }
+    method_map = Map.get( map, url, %{} )
+    tid_map = Map.get( method_map, method, %{} )
+    tid_map = Map.put( tid_map, tid, response )
+    method_map = Map.put( method_map, method, tid_map )
+    { :reply, tid, { Map.put( map, url, method_map ), request_serial + 1 } }
   end
 
   def handle_call( { :register_default_action, response }, _from, { map, request_serial } ) do
@@ -63,14 +69,8 @@ defmodule MockHttpServer.RegistrationService do
     { :reply, Map.get( map, tid, Map.get( map, :unknown ) ), state }
   end
 
-  def handle_call( { :fetch, url, tid }, _from, state = { map, _ } ) do
-    url_map = Map.get( map, url )
-    response = case url_map do
-                 m when is_map( m ) -> Map.get( m, tid, Map.get( map, :unknown ) )
-                 nil -> Map.get( map, :unknown )
-               end
-
-    { :reply, response, state }
+  def handle_call( { :fetch, method, url, tid }, _from, state = { map, _ } ) do
+    { :reply, get_in( map, [ url, method, tid ] ) || Map.get(map, :unknown), state }
   end
 
   def handle_call( { :unregister, tid }, _from, { map, request_serial } ) do
