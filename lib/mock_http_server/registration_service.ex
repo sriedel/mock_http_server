@@ -83,6 +83,9 @@ defmodule MockHttpServer.RegistrationService do
   end
 
   def handle_call( { :fetch, method, url, tid }, _from, state = { map, _ } ) do
+    IO.inspect url
+    IO.inspect method
+    IO.inspect tid
     { :reply, get_in( map, [ url, method, tid ] ) || Map.get( map, :unknown ), state }
   end
 
