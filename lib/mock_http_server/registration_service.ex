@@ -40,9 +40,8 @@ defmodule MockHttpServer.RegistrationService do
     GenServer.call( @process_name, { :fetch, method, url, tid } )
   end
 
-  def registration_table do
-    GenServer.call( @process_name, { :get_registration_table } )
-  end
+  def registration_table, do: GenServer.call( @process_name, { :get_registration_table } )
+  def clear, do: GenServer.call( @process_name, { :clear_registration_table } )
 
   # internal API
   def init( :ok ) do
@@ -83,9 +82,6 @@ defmodule MockHttpServer.RegistrationService do
   end
 
   def handle_call( { :fetch, method, url, tid }, _from, state = { map, _ } ) do
-    IO.inspect url
-    IO.inspect method
-    IO.inspect tid
     { :reply, get_in( map, [ url, method, tid ] ) || Map.get( map, :unknown ), state }
   end
 
@@ -95,6 +91,10 @@ defmodule MockHttpServer.RegistrationService do
 
   def handle_call( { :get_registration_table }, _from, state = { map, _request_serial } ) do
     { :reply, map, state }
+  end
+
+  def handle_call( { :clear_registration_table }, _from, { _map, request_serial } ) do
+    { :reply, :ok, { %{}, request_serial } }
   end
 
   def handle_call( :shutdown, _from, state ) do
