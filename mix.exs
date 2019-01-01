@@ -16,8 +16,7 @@ defmodule MockHttpServer.Mixfile do
   def application do
     [ 
       extra_applications: [:logger, :cowboy, :plug],
-      mod: { MockHttpServer, [ Application.get_env( :mock_http_server, :ip ),
-                               Application.get_env( :mock_http_server, :port ) ] }
+      mod: { MockHttpServer, [] }
     ]
   end
 
