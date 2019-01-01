@@ -38,7 +38,7 @@ defmodule MockHttpServer.HttpServer do
     { _header_name, tid } = List.keyfind( conn.req_headers, "x-mock-tid", 0, { nil, nil } )
     Logger.info( "MockHttpServer received '#{inspect conn.method} #{inspect request_url( conn )}' with TID #{inspect tid}" )
     response = { status_code, headers, body } =  RegistrationService.fetch( conn.method, request_url( conn ), tid )
-    Logger.info( "MockHttpServer found response:\n Status: #{inspect status_code}\n Headers: #{inspect headers)}\n Body: #{inspect body}" )
+    Logger.info( "MockHttpServer found response:\n Status: #{inspect status_code}\n Headers: #{inspect headers}\n Body: #{inspect body}" )
     { conn, response }
   end
 
