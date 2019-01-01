@@ -2,13 +2,20 @@ defmodule MockHttpServer.HttpServer do
   alias MockHttpServer.RegistrationService
   import Plug.Conn
 
+  @default_ip   { 127, 0, 0, 1 }
+  @default_port 4444
+
+  def start_link( opts \\ [] ) do
+    ip = Keyword.get( opts, :ip )
+    port = Keyword.get( opts, :port )
+    start( ip || @default_ip, port || @default_port )
+  end
+
   def start( ip, port ) when is_tuple( ip ) and is_integer( port ) do
     Plug.Cowboy.http( __MODULE__, [], port: port, ip: ip )
   end
 
-  def init( options ) do
-    options
-  end
+  def init( options ), do: options
 
   def call( conn, _opts \\ [] ) do
     conn 
@@ -17,11 +24,17 @@ defmodule MockHttpServer.HttpServer do
     |> send_response
   end
 
+  def child_spec( opts ) do
+    %{ id:       __MODULE__,
+       start:    { __MODULE__, :start_link, [opts] },
+       type:     :worker,
+       restart:  :permanent,
+       shutdown: 100 }
+  end
+
   defp get_registered_response( conn ) do
-    # IO.inspect conn.req_headers
     { _header_name, tid } = List.keyfind( conn.req_headers, "x-mock-tid", 0, { nil, nil } )
     response = RegistrationService.fetch( conn.method, request_url( conn ), tid )
-    # IO.inspect response
     { conn, response }
   end
 

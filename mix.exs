@@ -14,7 +14,11 @@ defmodule MockHttpServer.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger, :cowboy, :plug]]
+    [ 
+      extra_applications: [:logger, :cowboy, :plug],
+      mod: { MockHttpServer, [ Application.get_env( :mock_http_server, :ip ),
+                               Application.get_env( :mock_http_server, :port ) ] }
+    ]
   end
 
   # Dependencies can be Hex packages:
