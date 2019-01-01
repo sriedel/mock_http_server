@@ -1,6 +1,7 @@
 defmodule MockHttpServer.HttpServer do
   alias MockHttpServer.RegistrationService
   import Plug.Conn
+  require Logger
 
   @default_ip   { 127, 0, 0, 1 }
   @default_port 4444
@@ -12,6 +13,7 @@ defmodule MockHttpServer.HttpServer do
   end
 
   def start( ip, port ) when is_tuple( ip ) and is_integer( port ) do
+    Logger.info( "MockHttpServer starting for http://#{ip |> Tuple.to_list |> Enum.join(".")}:#{port}" )
     Plug.Cowboy.http( __MODULE__, [], port: port, ip: ip )
   end
 
@@ -34,7 +36,9 @@ defmodule MockHttpServer.HttpServer do
 
   defp get_registered_response( conn ) do
     { _header_name, tid } = List.keyfind( conn.req_headers, "x-mock-tid", 0, { nil, nil } )
-    response = RegistrationService.fetch( conn.method, request_url( conn ), tid )
+    Logger.info( "MockHttpServer received '#{conn.method} #{request_url( conn )}' with TID #{tid}" )
+    response = { status_code, headers, body } =  RegistrationService.fetch( conn.method, request_url( conn ), tid )
+    Logger.info( "MockHttpServer found response:\n Status: #{status_code}\n Headers: #{headers}\n Body: #{body}" )
     { conn, response }
   end
 
