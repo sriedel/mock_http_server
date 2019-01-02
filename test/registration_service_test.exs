@@ -2,6 +2,13 @@ defmodule MockHttpServerRegistrationTest do
   use ExUnit.Case
   alias MockHttpServer.RegistrationService
 
+  setup do
+    if MockHttpServer.RegistrationService in Process.registered do
+      RegistrationService.stop
+    end
+    :ok
+  end
+
   test "starting and stopping the service" do
     assert { :ok, _ } = RegistrationService.start_link 
     assert RegistrationService in Process.registered

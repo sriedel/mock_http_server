@@ -4,6 +4,13 @@ defmodule MockHttpServerTest do
   alias MockHttpServer.RegistrationService
   alias MockHttpServer.HttpServer
 
+  setup do
+    if MockHttpServer.RegistrationService in Process.registered do
+      RegistrationService.stop 
+    end
+    :ok
+  end
+
   test "requesting a set-up mocked test url by tid" do
     { :ok, _ } = RegistrationService.start_link
     registered_url = "http://www.example.com/some/path"
