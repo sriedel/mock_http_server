@@ -25,3 +25,4 @@ config :mock_http_server, :port, 4444
 # here (which is why it is important to import them last).
 #
 #     import_config "#{Mix.env}.exs"
+import_config "#{Mix.env}.exs"
