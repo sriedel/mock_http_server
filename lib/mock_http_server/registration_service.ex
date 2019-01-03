@@ -27,19 +27,11 @@ defmodule MockHttpServer.RegistrationService do
     GenServer.call( @process_name, { :register_default_action, response } )
   end
 
-  def unregister( tid ) do
-    GenServer.call( @process_name, { :unregister, tid } )
-  end
+  def unregister( tid ), do: GenServer.call( @process_name, { :unregister, tid } )
 
-  def fetch( tid ) do
-    GenServer.call( @process_name, { :fetch, tid } )
-  end
-
+  def fetch( tid ), do: GenServer.call( @process_name, { :fetch, tid } )
   def fetch( url, tid ), do: fetch( "GET", url, tid )
-
-  def fetch( method, url, tid ) do
-    GenServer.call( @process_name, { :fetch, method, url, tid } )
-  end
+  def fetch( method, url, tid ), do: GenServer.call( @process_name, { :fetch, method, url, tid } )
 
   def registration_table, do: GenServer.call( @process_name, { :get_registration_table } )
   def clear, do: GenServer.call( @process_name, { :clear_registration_table } )
