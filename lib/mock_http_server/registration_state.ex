@@ -8,13 +8,13 @@ defmodule MockHttpServer.RegistrationState do
   @default_unregistered_url_response { 999, [], "" }
 
   def new do
-    %State{ url_map:        _initial_url_map(),
+    %State{ url_map:        %{},
             unregistered:   @default_unregistered_url_response,
             request_serial: @initial_serial }
   end
 
   def clear( %State{ request_serial: serial, unregistered: unregistered_response } ) do
-    %State{ url_map:        _initial_url_map(),
+    %State{ url_map:        %{},
             unregistered:   unregistered_response,
             request_serial: serial }
   end
@@ -62,8 +62,6 @@ defmodule MockHttpServer.RegistrationState do
   end
 
   def get_url_map( %State{ url_map: url_map } ), do: url_map
-
-  defp _initial_url_map, do: %{}
 
   defp _add_response_to_url_map( url_map, url, method, tid, response ) do
     method_map = Map.get( url_map, url, %{} )
