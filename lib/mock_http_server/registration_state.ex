@@ -1,63 +1,63 @@
 defmodule MockHttpServer.RegistrationState do
   alias __MODULE__, as: State
 
-  @enforce_keys [ :url_map, :unknown, :request_serial ]
-  defstruct [ :url_map, :unknown, :request_serial ]
+  @enforce_keys [ :url_map, :unregistered, :request_serial ]
+  defstruct [ :url_map, :unregistered, :request_serial ]
 
   @initial_serial 0
-  @default_unknown_url_response { 999, [], "" }
+  @default_unregistered_url_response { 999, [], "" }
 
   def new do
     %State{ url_map:        _initial_url_map(),
-            unknown:        @default_unknown_url_response,
+            unregistered:   @default_unregistered_url_response,
             request_serial: @initial_serial }
   end
 
-  def clear( %State{ request_serial: serial, unknown: unknown_response } ) do
+  def clear( %State{ request_serial: serial, unregistered: unregistered_response } ) do
     %State{ url_map:        _initial_url_map(),
-            unknown:        unknown_response,
+            unregistered:   unregistered_response,
             request_serial: serial }
   end
 
   def next_tid( %State{ request_serial: serial } ), do: Integer.to_string( serial + 1 )
 
-  def set_response( %State{ url_map: url_map, unknown: unknown, request_serial: serial }, url, method, tid, response ) do
+  def set_response( %State{ url_map: url_map, unregistered: unregistered, request_serial: serial }, url, method, tid, response ) do
     new_url_map = _add_response_to_url_map( url_map, url, method, tid, response )
 
     %State{ url_map:        new_url_map,
-            unknown:        unknown,
+            unregistered:   unregistered,
             request_serial: serial + 1 }
   end
 
-  def set_response( %State{ url_map: url_map, unknown: unknown, request_serial: serial }, tid, response ) do
+  def set_response( %State{ url_map: url_map, unregistered: unregistered, request_serial: serial }, tid, response ) do
     %State{ url_map:        Map.put( url_map, tid, response ),
-            unknown:        unknown,
+            unregistered:   unregistered,
             request_serial: serial + 1 }
   end
   
-  def get_response( %State{ url_map: url_map, unknown: unknown }, url, method ) do
+  def get_response( %State{ url_map: url_map, unregistered: unregistered }, url, method ) do
     first_tid = ( get_in( url_map, [ url, method ] ) || %{} )
                 |> Map.keys
                 |> Enum.sort
                 |> Enum.at( 0 )
-    get_in( url_map, [ url, method, first_tid ] ) || unknown
+    get_in( url_map, [ url, method, first_tid ] ) || unregistered
   end
 
-  def get_response( %State{ url_map: url_map, unknown: unknown }, tid ), do: Map.get( url_map, tid, unknown )
+  def get_response( %State{ url_map: url_map, unregistered: unregistered }, tid ), do: Map.get( url_map, tid, unregistered )
 
-  def get_response( %State{ url_map: url_map, unknown: unknown }, url, method, tid ) do
-    get_in( url_map, [ url, method, tid ] ) || unknown
+  def get_response( %State{ url_map: url_map, unregistered: unregistered }, url, method, tid ) do
+    get_in( url_map, [ url, method, tid ] ) || unregistered
   end
 
-  def remove_response( %State{ url_map: url_map, unknown: unknown, request_serial: serial }, tid ) do
+  def remove_response( %State{ url_map: url_map, unregistered: unregistered, request_serial: serial }, tid ) do
     %State{ url_map:        Map.delete( url_map, tid ),
-            unknown:        unknown,
+            unregistered:   unregistered,
             request_serial: serial }
   end
 
   def set_default_response( %State{ url_map: url_map, request_serial: serial }, response ) do
     %State{ url_map:        url_map,
-            unknown:        response,
+            unregistered:   response,
             request_serial: serial }
   end
 
