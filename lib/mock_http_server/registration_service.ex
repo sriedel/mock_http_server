@@ -2,6 +2,7 @@ defmodule MockHttpServer.RegistrationService do
   use GenServer
 
   @process_name __MODULE__
+  @default_unknown_url_response { 999, [], "" }
 
   def start_link( _opts \\ [] ) do
     GenServer.start_link( __MODULE__, :ok, [ name: @process_name ] )
@@ -45,18 +46,18 @@ defmodule MockHttpServer.RegistrationService do
 
   # internal API
   def init( :ok ) do
-    map = Map.put( %{}, :unknown, { 999, [], "" } )
+    map = Map.put( %{}, :unknown, @default_unknown_url_response )
     init_serial = 0
     { :ok, { map, init_serial } }
   end
 
-  def handle_call( { :register, response }, _from, { map, request_serial } ) do
-    tid = ( request_serial + 1 ) |> Integer.to_string
+  def handle_call( { :register, response }, _from, state = { map, request_serial } ) do
+    tid = _generate_tid( state )
     { :reply, tid, { Map.put( map, tid, response ), request_serial + 1 } }
   end
 
-  def handle_call( { :register, method, url, response }, _from, { map, request_serial } ) do
-    tid = ( request_serial + 1 ) |> Integer.to_string
+  def handle_call( { :register, method, url, response }, _from, state = { map, request_serial } ) do
+    tid = _generate_tid( state )
     method_map = Map.get( map, url, %{} )
     tid_map = Map.get( method_map, method, %{} )
     tid_map = Map.put( tid_map, tid, response )
@@ -99,5 +100,9 @@ defmodule MockHttpServer.RegistrationService do
 
   def handle_call( :shutdown, _from, state ) do
     { :stop, :normal, :ok, state }
+  end
+
+  defp _generate_tid( _state = { _map, request_serial } ) do
+    Integer.to_string( request_serial + 1 )
   end
 end
