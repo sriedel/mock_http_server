@@ -21,6 +21,12 @@ defmodule MockHttpServer.RegistrationState do
 
   def next_tid( %State{ request_serial: serial } ), do: Integer.to_string( serial + 1 )
 
+  def set_default_response( %State{ url_map: url_map, request_serial: serial }, response ) do
+    %State{ url_map:        url_map,
+            unregistered:   response,
+            request_serial: serial }
+  end
+
   def set_response( %State{ url_map: url_map, unregistered: unregistered, request_serial: serial }, url, method, tid, response ) do
     new_url_map = _add_response_to_url_map( url_map, url, method, tid, response )
 
@@ -33,6 +39,12 @@ defmodule MockHttpServer.RegistrationState do
     %State{ url_map:        Map.put( url_map, tid, response ),
             unregistered:   unregistered,
             request_serial: serial + 1 }
+  end
+
+  def remove_response( %State{ url_map: url_map, unregistered: unregistered, request_serial: serial }, tid ) do
+    %State{ url_map:        Map.delete( url_map, tid ),
+            unregistered:   unregistered,
+            request_serial: serial }
   end
   
   def get_response( %State{ url_map: url_map, unregistered: unregistered }, url, method ) do
@@ -47,18 +59,6 @@ defmodule MockHttpServer.RegistrationState do
 
   def get_response( %State{ url_map: url_map, unregistered: unregistered }, url, method, tid ) do
     get_in( url_map, [ url, method, tid ] ) || unregistered
-  end
-
-  def remove_response( %State{ url_map: url_map, unregistered: unregistered, request_serial: serial }, tid ) do
-    %State{ url_map:        Map.delete( url_map, tid ),
-            unregistered:   unregistered,
-            request_serial: serial }
-  end
-
-  def set_default_response( %State{ url_map: url_map, request_serial: serial }, response ) do
-    %State{ url_map:        url_map,
-            unregistered:   response,
-            request_serial: serial }
   end
 
   def get_url_map( %State{ url_map: url_map } ), do: url_map
