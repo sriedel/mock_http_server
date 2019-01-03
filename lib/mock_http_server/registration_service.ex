@@ -51,47 +51,46 @@ defmodule MockHttpServer.RegistrationService do
     { :ok, { map, init_serial } }
   end
 
-  def handle_call( { :register, response }, _from, state = { map, request_serial } ) do
+  def handle_call( { :register, response }, _from, state = { url_map, request_serial } ) do
     tid = _generate_tid( state )
-    { :reply, tid, { Map.put( map, tid, response ), request_serial + 1 } }
+    { :reply, tid, { Map.put( url_map, tid, response ), request_serial + 1 } }
   end
 
-  def handle_call( { :register, method, url, response }, _from, state = { map, request_serial } ) do
+  def handle_call( { :register, method, url, response }, _from, state = { url_map, request_serial } ) do
     tid = _generate_tid( state )
-    method_map = Map.get( map, url, %{} )
-    tid_map = Map.get( method_map, method, %{} )
-    tid_map = Map.put( tid_map, tid, response )
-    method_map = Map.put( method_map, method, tid_map )
-    { :reply, tid, { Map.put( map, url, method_map ), request_serial + 1 } }
+    new_url_map = _add_response_to_url_map( url_map, url, method, tid, response )
+
+    { :reply, tid, { new_url_map, request_serial + 1 } }
   end
 
-  def handle_call( { :register_default_action, response }, _from, { map, request_serial } ) do
-    { :reply, :ok, { Map.put( map, :unknown, response ), request_serial } }
+  def handle_call( { :register_default_action, response }, _from, { url_map, request_serial } ) do
+    { :reply, :ok, { Map.put( url_map, :unknown, response ), request_serial } }
   end
 
-  def handle_call( { :fetch, tid }, _from, state = { map, _ } ) do
-    { :reply, Map.get( map, tid, Map.get( map, :unknown ) ), state }
+  def handle_call( { :fetch, tid }, _from, state = { url_map, _ } ) do
+    { :reply, Map.get( url_map, tid, url_map.unknown ), state }
   end
 
-  def handle_call( { :fetch, method, url, nil }, _from, state = { map, _ } ) do
-    first_tid = ( get_in( map, [ url, method ] ) || %{} )
+  def handle_call( { :fetch, method, url, nil }, _from, state = { url_map, _ } ) do
+    first_tid = ( get_in( url_map, [ url, method ] ) || %{} )
                 |> Map.keys
                 |> Enum.sort
                 |> Enum.at( 0 )
-    response = get_in( map, [ url, method, first_tid ] ) || Map.get( map, :unknown )
+    response = get_in( url_map, [ url, method, first_tid ] ) || url_map.unknown
+
     { :reply, response, state }
   end
 
-  def handle_call( { :fetch, method, url, tid }, _from, state = { map, _ } ) do
-    { :reply, get_in( map, [ url, method, tid ] ) || Map.get( map, :unknown ), state }
+  def handle_call( { :fetch, method, url, tid }, _from, state = { url_map, _ } ) do
+    { :reply, get_in( url_map, [ url, method, tid ] ) || url_map.unknown, state }
   end
 
-  def handle_call( { :unregister, tid }, _from, { map, request_serial } ) do
-    { :reply, :ok, { Map.delete( map, tid ), request_serial } }
+  def handle_call( { :unregister, tid }, _from, { url_map, request_serial } ) do
+    { :reply, :ok, { Map.delete( url_map, tid ), request_serial } }
   end
 
-  def handle_call( { :get_registration_table }, _from, state = { map, _request_serial } ) do
-    { :reply, map, state }
+  def handle_call( { :get_registration_table }, _from, state = { url_map, _request_serial } ) do
+    { :reply, url_map, state }
   end
 
   def handle_call( { :clear_registration_table }, _from, { _map, request_serial } ) do
@@ -102,7 +101,15 @@ defmodule MockHttpServer.RegistrationService do
     { :stop, :normal, :ok, state }
   end
 
-  defp _generate_tid( _state = { _map, request_serial } ) do
+  defp _generate_tid( _state = { _url_map, request_serial } ) do
     Integer.to_string( request_serial + 1 )
+  end
+
+  defp _add_response_to_url_map( url_map, url, method, tid, response ) do
+    method_map = Map.get( url_map, url, %{} )
+    tid_map = Map.get( method_map, method, %{} )
+    tid_map = Map.put( tid_map, tid, response )
+    method_map = Map.put( method_map, method, tid_map )
+    Map.put( url_map, url, method_map )
   end
 end
