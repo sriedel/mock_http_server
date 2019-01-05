@@ -1,5 +1,8 @@
 # ChangeLog
 
+## 0.1.2
+- Add hex.pm publishing data
+
 ## 0.1.1
 - Abstract responce registration state from registration GenServer
 - Introduce struct for registration state

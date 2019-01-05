@@ -3,11 +3,16 @@ defmodule MockHttpServer.Mixfile do
 
   def project do
     [app: :mock_http_server,
-     version: "0.1.1",
+     version: "0.1.2",
      elixir: "~> 1.7",
      build_embedded:  Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps()]
+     deps: deps(),
+     description: "A mock http server for testing/mocking remote http calls",
+     package: [ licenses: [ "LGPL 2" ],
+                links: %{ "GitHub" => "https://github.com/sriedel/mock_http_server" } ],
+     source_url: "https://github.com/sriedel/mock_http_server"
+   ]
   end
 
   # Configuration for the OTP application
@@ -33,7 +38,8 @@ defmodule MockHttpServer.Mixfile do
     [ { :plug, "~> 1.7.0" },
       { :cowboy, "~> 2.6.0" },
       { :plug_cowboy, "~> 2.0.0" },
-      { :logger_file_backend, "0.0.10", only: :test }
+      { :logger_file_backend, "0.0.10", only: :test },
+      { :ex_doc, ">= 0.0.0", only: :dev }
     ]
   end
 end
