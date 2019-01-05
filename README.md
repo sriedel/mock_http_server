@@ -43,6 +43,15 @@ Register your responses:
     # or using an implicit GET method
     transaction_id = MockHttpServer.RegistrationService.register( url, response )
 
+You can also provide a list of responses; on each subsequent call the next response
+in the list of registered responses will be returned. If more calls are issued 
+than responses have been registered, the last response of the list will be
+returned:
+
+    response_1 = { 401, [], "Unauthorized" }
+    response_2 = { 200, [], "OK" }
+    transaction_id = MockHttpServer.RegistrationService.register( method, url, [ response_1, response_2 ] )
+
 Trigger a canned response to a query:
 
     use Plug.Test
