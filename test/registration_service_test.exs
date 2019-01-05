@@ -110,12 +110,14 @@ defmodule MockHttpServerRegistrationTest do
     RegistrationService.stop
   end
 
-  test "unregistering a response" do
+  test "unregistering a response by tid that was registered with a url and method" do
     registered_response = { 404, [], "not found" }
+    registered_url = "http://www.example.com"
+    registered_method = "PUT"
     { :ok, _ } = RegistrationService.start_link
-    tid = RegistrationService.register( registered_response )
+    tid = RegistrationService.register( registered_method, registered_url, registered_response )
     RegistrationService.unregister( tid )
-    assert { 999, [], "" } = RegistrationService.fetch( tid )
+    assert { 999, [], "" } = RegistrationService.fetch( registered_method, registered_url, tid )
     RegistrationService.stop
   end
 end

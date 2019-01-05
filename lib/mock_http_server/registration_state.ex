@@ -42,7 +42,9 @@ defmodule MockHttpServer.RegistrationState do
   end
 
   def remove_response( %State{ url_map: url_map, unregistered: unregistered, request_serial: serial }, tid ) do
-    %State{ url_map:        Map.delete( url_map, tid ),
+    new_url_map = _remove_response_from_url_map( url_map, tid )
+
+    %State{ url_map:        new_url_map,
             unregistered:   unregistered,
             request_serial: serial }
   end
@@ -69,5 +71,16 @@ defmodule MockHttpServer.RegistrationState do
     tid_map = Map.put( tid_map, tid, response )
     method_map = Map.put( method_map, method, tid_map )
     Map.put( url_map, url, method_map )
+  end
+
+  defp _remove_response_from_url_map( url_map, tid ) do
+    Enum.map( url_map, fn( { url, method_map } ) ->
+      filtered_method_map = Enum.map( method_map, fn( { method, tid_map } ) -> 
+                              { method, Map.delete( tid_map, tid ) }
+                            end )
+                            |> Map.new  
+      { url, filtered_method_map }
+    end )
+    |> Map.new
   end
 end
