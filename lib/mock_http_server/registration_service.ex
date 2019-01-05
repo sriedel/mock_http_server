@@ -46,17 +46,25 @@ defmodule MockHttpServer.RegistrationService do
   end
 
   def handle_call( { :fetch, tid }, _from, state ) do
-    { :reply, State.get_response( state, tid ), state }
+    response = State.get_response( state, tid )
+    new_state = State.increment_call_count( state, tid )
+
+    { :reply, response, new_state }
   end
 
   def handle_call( { :fetch, method, url, nil }, _from, state ) do
-    response = State.get_response( state, url, method )
+    tid = State.find_first_tid( state, url, method )
+    response = State.get_response( state, tid )
+    new_state = State.increment_call_count( state, tid )
 
-    { :reply, response, state }
+    { :reply, response, new_state }
   end
 
   def handle_call( { :fetch, method, url, tid }, _from, state ) do
-    { :reply, State.get_response( state, url, method, tid ), state }
+    response = State.get_response( state, url, method, tid )
+    new_state = State.increment_call_count( state, tid )
+
+    { :reply, response, new_state }
   end
 
   def handle_call( { :unregister, tid }, _from, state ) do

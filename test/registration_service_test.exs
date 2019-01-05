@@ -112,4 +112,18 @@ defmodule MockHttpServerRegistrationTest do
     assert { 999, [], "" } = RegistrationService.fetch( registered_method, registered_url, tid )
     RegistrationService.stop
   end
+
+  test "registering a sequence of responses" do
+    registered_method = "HEAD"
+    registered_url = "http://www.example.com/some/url"
+    registered_response_1 = { 401, [], "unauthorized" }
+    registered_response_2 = { 200, [], "ok" }
+
+    { :ok, _ } = RegistrationService.start_link
+    tid = RegistrationService.register( registered_method, registered_url, [ registered_response_1, registered_response_2 ] )
+    assert ^registered_response_1 = RegistrationService.fetch( registered_method, registered_url, tid )
+    assert ^registered_response_2 = RegistrationService.fetch( registered_method, registered_url, tid )
+    assert ^registered_response_2 = RegistrationService.fetch( registered_method, registered_url, tid )
+    RegistrationService.stop
+  end
 end
