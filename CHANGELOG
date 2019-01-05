@@ -1,0 +1,9 @@
+# ChangeLog
+
+## 0.1.1
+- Abstract responce registration state from registration GenServer
+- Introduce struct for registration state
+- Lots of code cleanup
+
+## 0.1.0
+- First practically useable version
