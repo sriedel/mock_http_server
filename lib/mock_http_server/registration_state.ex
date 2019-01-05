@@ -56,7 +56,12 @@ defmodule MockHttpServer.RegistrationState do
 
   def increment_call_count( state = %State{}, nil ), do: state
   def increment_call_count( %State{ url_map: url_map, unregistered: unregistered, request_serial: serial, call_count_map: call_count_map }, tid ) do
-    { _, new_call_count_map } = Map.get_and_update( call_count_map, tid, &( { &1, ( &1 || 0 ) + 1 } ) )
+    { _, new_call_count_map } = Map.get_and_update( call_count_map, 
+                                                    tid,
+                                                    fn
+                                                      nil   -> { nil, :pop }
+                                                      count -> { count, count + 1 }
+                                                    end )
 
     %State{ url_map: url_map,
             unregistered: unregistered,
