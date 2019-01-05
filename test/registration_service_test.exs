@@ -23,7 +23,7 @@ defmodule MockHttpServerRegistrationTest do
     { :ok, _ } = RegistrationService.start_link
     tid = RegistrationService.register( registered_url, registered_response )
     assert ^registered_response = RegistrationService.fetch( registered_url, tid )
-    assert ^default_response = RegistrationService.fetch( tid )
+    assert ^registered_response = RegistrationService.fetch( tid )
     assert ^default_response = RegistrationService.fetch( "https://www.example.com", tid )
     RegistrationService.stop
   end
@@ -35,7 +35,7 @@ defmodule MockHttpServerRegistrationTest do
     { :ok, _ } = RegistrationService.start_link
     tid = RegistrationService.register( registered_url, registered_response )
     assert ^registered_response = RegistrationService.fetch( registered_url, tid )
-    assert ^default_response = RegistrationService.fetch( tid )
+    assert ^registered_response = RegistrationService.fetch( tid )
     assert ^default_response = RegistrationService.fetch( "http://www.example.com", tid )
     assert ^default_response = RegistrationService.fetch( "http://www.example.com/some/other/path", tid )
     assert ^default_response = RegistrationService.fetch( "https://www.example.com/some/path", tid )
@@ -49,7 +49,7 @@ defmodule MockHttpServerRegistrationTest do
     { :ok, _ } = RegistrationService.start_link
     tid = RegistrationService.register( registered_url, registered_response )
     assert ^registered_response = RegistrationService.fetch( registered_url, tid )
-    assert ^default_response = RegistrationService.fetch( tid )
+    assert ^registered_response = RegistrationService.fetch( tid )
     assert ^default_response = RegistrationService.fetch( "http://www.example.com", tid )
     assert ^default_response = RegistrationService.fetch( "http://www.example.com/some/other/path", tid )
     assert ^default_response = RegistrationService.fetch( "https://www.example.com/some/path", tid )
@@ -64,7 +64,7 @@ defmodule MockHttpServerRegistrationTest do
     { :ok, _ } = RegistrationService.start_link
     tid = RegistrationService.register( "POST", registered_url, registered_response )
     assert ^registered_response = RegistrationService.fetch( "POST", registered_url, tid )
-    assert ^default_response = RegistrationService.fetch( tid )
+    assert ^registered_response = RegistrationService.fetch( tid )
     assert ^default_response = RegistrationService.fetch( "POST", "http://www.example.com", tid )
     assert ^default_response = RegistrationService.fetch( "POST", "http://www.example.com/some/other/path", tid )
     assert ^default_response = RegistrationService.fetch( "POST", "https://www.example.com/some/path", tid )

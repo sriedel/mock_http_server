@@ -51,7 +51,16 @@ defmodule MockHttpServer.RegistrationState do
     get_in( url_map, [ url, method, first_tid ] ) || unregistered
   end
 
-  def get_response( %State{ url_map: url_map, unregistered: unregistered }, tid ), do: Map.get( url_map, tid, unregistered )
+  def get_response( %State{ url_map: url_map, unregistered: unregistered }, tid ) do
+    url_map
+    |> Enum.find_value( unregistered, 
+                        fn( { _url, method_map } ) ->
+                          Enum.find_value( method_map, 
+                                           fn( { _method, tid_map } ) ->
+                                             Map.get( tid_map, tid )
+                                           end )
+                        end )
+  end
 
   def get_response( %State{ url_map: url_map, unregistered: unregistered }, url, method, tid ) do
     get_in( url_map, [ url, method, tid ] ) || unregistered
