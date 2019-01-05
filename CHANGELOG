@@ -1,5 +1,9 @@
 # ChangeLog
 
+## 0.2.0
+- Remove registering a response without providing a url
+- Fix deregistration of a response
+
 ## 0.1.2
 - Add hex.pm publishing data
 
