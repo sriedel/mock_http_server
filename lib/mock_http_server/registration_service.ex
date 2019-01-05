@@ -13,10 +13,6 @@ defmodule MockHttpServer.RegistrationService do
   end
 
   # external API
-  def register( response ) do
-    GenServer.call( @process_name, { :register, response } )
-  end
-
   def register( url, response ), do: register( "GET", url, response )
 
   def register( method, url, response ) do
@@ -38,12 +34,6 @@ defmodule MockHttpServer.RegistrationService do
 
   # internal API
   def init( :ok ), do: { :ok, State.new() }
-
-  def handle_call( { :register, response }, _from, state ) do
-    tid = State.next_tid( state )
-
-    { :reply, tid, State.set_response( state, tid, response ) }
-  end
 
   def handle_call( { :register, method, url, response }, _from, state ) do
     tid = State.next_tid( state )

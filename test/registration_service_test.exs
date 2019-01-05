@@ -16,14 +16,6 @@ defmodule MockHttpServerRegistrationTest do
     refute RegistrationService in Process.registered
   end
 
-  test "registering a response without url" do
-    registered_response = { 404, [], "not found" }
-    { :ok, _ } = RegistrationService.start_link
-    tid = RegistrationService.register( registered_response )
-    assert ^registered_response = RegistrationService.fetch( tid )
-    RegistrationService.stop
-  end
-
   test "registering a response with an url containing only scheme and host" do
     default_response = { 999, [], "" }
     registered_response = { 404, [], "not found" }

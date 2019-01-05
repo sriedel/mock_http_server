@@ -35,12 +35,6 @@ defmodule MockHttpServer.RegistrationState do
             request_serial: serial + 1 }
   end
 
-  def set_response( %State{ url_map: url_map, unregistered: unregistered, request_serial: serial }, tid, response ) do
-    %State{ url_map:        Map.put( url_map, tid, response ),
-            unregistered:   unregistered,
-            request_serial: serial + 1 }
-  end
-
   def remove_response( %State{ url_map: url_map, unregistered: unregistered, request_serial: serial }, tid ) do
     new_url_map = _remove_response_from_url_map( url_map, tid )
 
