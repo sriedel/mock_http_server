@@ -3,6 +3,7 @@
 ## 0.2.0
 - Remove registering a response without providing a url
 - Fix deregistration of a response
+- Allow list of responses for a registered url
 
 ## 0.1.2
 - Add hex.pm publishing data

@@ -63,8 +63,8 @@ defmodule MockHttpServer.RegistrationState do
                                                       count -> { count, count + 1 }
                                                     end )
 
-    %State{ url_map: url_map,
-            unregistered: unregistered,
+    %State{ url_map:        url_map,
+            unregistered:   unregistered,
             request_serial: serial,
             call_count_map: new_call_count_map }
   end
