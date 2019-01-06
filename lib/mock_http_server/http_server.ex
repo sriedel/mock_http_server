@@ -12,6 +12,9 @@ defmodule MockHttpServer.HttpServer do
     start( ip || @default_ip, port || @default_port )
   end
 
+  def start( nil, nil ), do: start( @default_ip, @default_port )
+  def start( nil, port ), do: start( @default_ip, port )
+  def start( ip, nil ), do: start( ip, @default_port )
   def start( ip, port ) when is_tuple( ip ) and is_integer( port ) do
     Logger.info( "MockHttpServer starting for http://#{ip |> Tuple.to_list |> Enum.join(".")}:#{port}" )
     Plug.Cowboy.http( __MODULE__, [], port: port, ip: ip )
