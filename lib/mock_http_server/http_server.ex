@@ -3,8 +3,8 @@ defmodule MockHttpServer.HttpServer do
   import Plug.Conn
   require Logger
 
-  @default_ip   Application.get_env( :mock_http_server, :ip )
-  @default_port Application.get_env( :mock_http_server, :port )
+  @default_ip   Application.get_env( :mock_http_server, :ip, { 127, 0, 0, 1 } )
+  @default_port Application.get_env( :mock_http_server, :port, 4444 )
 
   def start_link( opts \\ [] ) do
     ip = Keyword.get( opts, :ip )
