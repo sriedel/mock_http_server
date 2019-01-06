@@ -1,4 +1,6 @@
 # ChangeLog
+## 0.2.2
+- Supply explicit default configuration values to Application.get_env
 
 ## 0.2.1
 - Explicitly catch non-configured http server ip and port in case the server
