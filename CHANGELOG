@@ -1,5 +1,8 @@
 # ChangeLog
 
+## 0.2.5
+- Will now sort TIDs numerically when determining the last registered
+  response
 ## 0.2.4
 - Return last response when retrieving are response without TID and
   multiple responses are registered
