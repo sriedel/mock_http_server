@@ -70,10 +70,17 @@ defmodule MockHttpServer.RegistrationState do
   end
 
   def find_first_tid( %State{ url_map: url_map }, url, method ) do
-    ( get_in( url_map, [ url, method ] ) || %{} )
-    |> Map.keys
-    |> Enum.sort
-    |> List.last
+    last_key = ( get_in( url_map, [ url, method ] ) || %{} )
+               |> Map.keys
+               |> Enum.map(&String.to_integer/1)
+               |> Enum.sort
+               |> List.last
+
+    if is_nil(last_key) do
+      nil
+    else
+      Integer.to_string(last_key)
+    end
   end
   
   def get_response( state = %State{ url_map: url_map, unregistered: unregistered }, tid ) do
