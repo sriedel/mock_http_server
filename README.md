@@ -10,7 +10,7 @@ Thus, multiple replies can be registered at once for a given URL, if need be.
 A response can be triggered either by providing only the transaction id in an
 HTTP header as returned during response registration, calling the url and method
 provided during registration (if multiple replies are registered with this 
-method/url combination, the first one registered will be returned), or a 
+method/url combination, the last one registered will be returned), or a 
 combination thereof, in order to trigger a specific response if multiple were
 registered.
 

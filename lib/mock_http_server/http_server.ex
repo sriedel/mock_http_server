@@ -3,18 +3,15 @@ defmodule MockHttpServer.HttpServer do
   import Plug.Conn
   require Logger
 
-  @default_ip   Application.get_env( :mock_http_server, :ip, { 127, 0, 0, 1 } )
-  @default_port Application.get_env( :mock_http_server, :port, 4444 )
-
   def start_link( opts \\ [] ) do
     ip = Keyword.get( opts, :ip )
     port = Keyword.get( opts, :port )
-    start( ip || @default_ip, port || @default_port )
+    start( ip || _default_ip(), port || _default_port() )
   end
 
-  def start( nil, nil ), do: start( @default_ip, @default_port )
-  def start( nil, port ), do: start( @default_ip, port )
-  def start( ip, nil ), do: start( ip, @default_port )
+  def start( nil, nil ), do: start( _default_ip(), _default_port() )
+  def start( nil, port ), do: start( _default_ip(), port )
+  def start( ip, nil ), do: start( ip, _default_port() )
   def start( ip, port ) when is_tuple( ip ) and is_integer( port ) do
     Logger.info( "MockHttpServer starting for http://#{ip |> Tuple.to_list |> Enum.join(".")}:#{port}" )
     Plug.Cowboy.http( __MODULE__, [], port: port, ip: ip )
@@ -57,4 +54,7 @@ defmodule MockHttpServer.HttpServer do
   defp send_response( { conn, { status_code, _headers, body } } ) do
     send_resp( conn, status_code, body )
   end
+
+  defp _default_ip, do:   Application.get_env( :mock_http_server, :ip, { 127, 0, 0, 1 } )
+  defp _default_port, do: Application.get_env( :mock_http_server, :port, 4444 )
 end

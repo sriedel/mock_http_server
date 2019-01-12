@@ -73,7 +73,7 @@ defmodule MockHttpServer.RegistrationState do
     ( get_in( url_map, [ url, method ] ) || %{} )
     |> Map.keys
     |> Enum.sort
-    |> Enum.at( 0 )
+    |> List.last
   end
   
   def get_response( state = %State{ url_map: url_map, unregistered: unregistered }, tid ) do
