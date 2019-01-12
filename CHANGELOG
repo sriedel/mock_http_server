@@ -1,5 +1,9 @@
 # ChangeLog
 
+## 0.2.4
+- Return last response when retrieving are response without TID and
+  multiple responses are registered
+
 ## 0.2.3
 - Supply default values as functions instead of module attributes
 

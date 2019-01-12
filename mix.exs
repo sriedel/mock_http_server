@@ -3,7 +3,7 @@ defmodule MockHttpServer.Mixfile do
 
   def project do
     [app: :mock_http_server,
-     version: "0.2.3",
+     version: "0.2.4",
      elixir: "~> 1.7",
      build_embedded:  Mix.env == :prod,
      start_permanent: Mix.env == :prod,
