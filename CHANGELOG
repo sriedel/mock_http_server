@@ -1,4 +1,8 @@
 # ChangeLog
+
+## 0.2.3
+- Supply default values as functions instead of module attributes
+
 ## 0.2.2
 - Supply explicit default configuration values to Application.get_env
 
