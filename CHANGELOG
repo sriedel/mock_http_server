@@ -1,4 +1,7 @@
 # ChangeLog
+## 0.3.0
+- Update Plug requirement to 1.8.x to be able to be used with current
+  phoenix versions
 
 ## 0.2.5
 - Will now sort TIDs numerically when determining the last registered

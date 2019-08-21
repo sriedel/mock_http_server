@@ -3,7 +3,7 @@ defmodule MockHttpServer.Mixfile do
 
   def project do
     [app: :mock_http_server,
-     version: "0.2.5",
+     version: "0.3.0",
      elixir: "~> 1.7",
      build_embedded:  Mix.env == :prod,
      start_permanent: Mix.env == :prod,
@@ -35,7 +35,7 @@ defmodule MockHttpServer.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
-    [ { :plug, "~> 1.7.0" },
+    [ { :plug, "~> 1.8.0" },
       { :cowboy, "~> 2.6.0" },
       { :plug_cowboy, "~> 2.0.0" },
       { :logger_file_backend, "0.0.10", only: :test },
